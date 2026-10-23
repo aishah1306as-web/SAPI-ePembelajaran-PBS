@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail, Shield, AlertCircle, ArrowRight, UserCheck } from 'lucide-react';
+import { Lock, Mail, ArrowRight, UserCheck } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { PBSLogo } from '../../components/institution/PBSBranding';
 import { Button } from '../../components/common/Button';
@@ -15,6 +15,12 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('password123');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string | null>('user-superadmin');
+
+  // Email boleh diedit untuk setiap pengguna dalam panel RBAC
+  const [userEmails, setUserEmails] = useState<Record<string, string>>(
+    () => Object.fromEntries(INITIAL_USERS.map((u) => [u.uid, u.email]))
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,13 +35,18 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleQuickLogin = async (presetEmail: string) => {
-    setEmail(presetEmail);
-    setIsSubmitting(true);
-    const success = await login(presetEmail, 'password123');
-    setIsSubmitting(false);
-    if (success) {
-      navigate('/dashboard');
+  // Klik peranan → isi email ke form atas sahaja (bukan auto-login)
+  const handleSelectRole = (uid: string) => {
+    setSelectedRole(uid);
+    setEmail(userEmails[uid]);
+    setLocalError(null);
+  };
+
+  // Kemaskini email dalam panel RBAC dan sync ke form atas jika peranan dipilih
+  const handleUserEmailChange = (uid: string, newEmail: string) => {
+    setUserEmails((prev) => ({ ...prev, [uid]: newEmail }));
+    if (selectedRole === uid) {
+      setEmail(newEmail);
     }
   };
 
@@ -49,7 +60,7 @@ export const LoginPage: React.FC = () => {
           Sistem Arkib Produk Inovasi ePembelajaran (SAPIe)
         </h2>
         <p className="mt-1 text-xs text-gray-500">
-          Portal Rasmi Pengurusan & Pemeliharaan Inovasi Digital Pembelajaran
+          Portal Rasmi Pengurusan &amp; Pemeliharaan Inovasi Digital Pembelajaran
         </p>
       </div>
 
@@ -63,6 +74,7 @@ export const LoginPage: React.FC = () => {
             </div>
           )}
 
+          {/* Form Log Masuk */}
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="label-base">Alamat E-mel Institusi</label>
@@ -105,38 +117,62 @@ export const LoginPage: React.FC = () => {
             </Button>
           </form>
 
-          {/* Quick Preset Buttons for Evaluation / Testing */}
+          {/* Panel Ujian Akses Peranan (RBAC) */}
           <div className="mt-6 pt-6 border-t border-gray-100">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
               <UserCheck className="w-4 h-4 text-navy-700" />
-              <span>Pilihan Pantas Peranan (Demonstrasi):</span>
+              <span>Ujian Akses Peranan (RBAC)</span>
             </div>
             <p className="text-[11px] text-gray-500 mb-3">
-              Klik profil di bawah untuk menguji kebenaran peranan (Role-Based Access Control) secara serta-merta:
+              Pilih peranan, masukkan e-mel anda sendiri, kemudian klik Log Masuk:
             </p>
 
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
               {INITIAL_USERS.map((u) => (
-                <button
+                <div
                   key={u.uid}
-                  type="button"
-                  onClick={() => handleQuickLogin(u.email)}
-                  className="w-full text-left p-2.5 rounded-lg border border-gray-200 hover:border-navy-400 hover:bg-navy-50/50 transition-all flex items-center justify-between group text-xs"
+                  onClick={() => handleSelectRole(u.uid)}
+                  className={`w-full text-left p-2.5 rounded-lg border transition-all cursor-pointer text-xs ${
+                    selectedRole === u.uid
+                      ? 'border-navy-500 bg-navy-50 ring-1 ring-navy-400'
+                      : 'border-gray-200 hover:border-navy-300 hover:bg-gray-50'
+                  }`}
                 >
-                  <div>
-                    <span className="font-semibold text-gray-900 group-hover:text-navy-900">
+                  {/* Nama + Badge Peranan */}
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-semibold text-gray-900 truncate">
                       {u.fullName}
                     </span>
-                    <span className="text-[10px] text-gray-500 block">
-                      {u.email}
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-navy-100 text-navy-800 shrink-0 ml-2 whitespace-nowrap">
+                      {u.role.replaceAll('_', ' ')}
                     </span>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-gray-100 text-gray-700 group-hover:bg-navy-100 group-hover:text-navy-800">
-                    {u.role.replace('_', ' ')}
-                  </span>
-                </button>
+
+                  {/* Input E-mel Boleh Diedit */}
+                  <div
+                    className="relative"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Mail className="w-3 h-3 text-gray-400 absolute left-2 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      value={userEmails[u.uid]}
+                      onChange={(e) => handleUserEmailChange(u.uid, e.target.value)}
+                      onClick={() => handleSelectRole(u.uid)}
+                      placeholder="emel@polibanting.edu.my"
+                      className="w-full pl-6 pr-2 py-1 text-[11px] border border-gray-200 rounded-md bg-white focus:outline-none focus:border-navy-400 focus:ring-1 focus:ring-navy-300 text-gray-600"
+                    />
+                  </div>
+                </div>
               ))}
             </div>
+
+            {selectedRole && (
+              <p className="text-[10px] text-navy-700 font-medium mt-2 text-center">
+                ✅ Peranan dipilih — semak e-mel di atas dan klik{' '}
+                <strong>Log Masuk ke SAPIe</strong>
+              </p>
+            )}
           </div>
         </div>
 
