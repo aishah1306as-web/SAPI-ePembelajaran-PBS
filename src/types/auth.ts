@@ -1,9 +1,17 @@
 export type UserRole = 
-  | 'super_admin'       // Super Admin: Kawalan penuh pentadbiran sistem
-  | 'pentadbir_uepm'    // Pentadbir UePM: Pengurusan arkib institusi & kelulusan
-  | 'pegawai_jabatan'   // Pegawai Jabatan: Kawalan & semakan peringkat jabatan (JKM, JPP, dll.)
-  | 'pensyarah'         // Pensyarah / Pencipta Produk: Pendaftaran, draf, pengemaskinian produk
-  | 'pengurusan';       // Pengurusan / Pembaca: Paparan sahaja (read-only)
+  | 'super_admin'         // Super Admin: Kawalan penuh pentadbiran sistem
+  | 'admin'               // Admin: Pentadbir sistem
+  | 'pentadbir_uepm'      // Pentadbir UePM: Pengurusan arkib institusi & kelulusan
+  | 'ketua_unit_uepm'     // Ketua Unit UePM: Ketua unit ePembelajaran
+  | 'pegawai_pbs'         // Pegawai ePembelajaran PBS: Pegawai ePembelajaran Politeknik Banting
+  | 'pegawai_jpp'         // Pegawai ePembelajaran JPP: Jabatan Penyelenggaraan Pesawat
+  | 'pegawai_jabatan'     // Pegawai Jabatan: Kawalan & semakan peringkat jabatan
+  | 'pegawai_jkm'         // Pegawai ePembelajaran JKM: Jabatan Kejuruteraan Mekanikal
+  | 'pegawai_jmsk'        // Pegawai ePembelajaran JMSK: Jabatan Matematik, Sains & Komputer
+  | 'pegawai_jpa'         // Pegawai ePembelajaran JPA: Jabatan Pengajian Am
+  | 'timbalan_pengarah'   // Timbalan Pengarah Akademik: Pengurusan akademik
+  | 'pensyarah'           // Pensyarah / Pencipta Produk: Pendaftaran, draf, pengemaskinian produk
+  | 'pengurusan';         // Pengurusan / Pembaca: Paparan sahaja (read-only)
 
 export interface UserProfile {
   uid: string;
