@@ -19,36 +19,40 @@ export const LoginPage: React.FC = () => {
 
   // Email boleh diedit untuk setiap pengguna dalam panel RBAC
   const [userEmails, setUserEmails] = useState<Record<string, string>>(
-    () => Object.fromEntries(INITIAL_USERS.map((u) => [u.uid, u.email]))
+    () => {
+      const map: Record<string, string> = {};
+      INITIAL_USERS.forEach((u) => { map[u.uid] = u.email; });
+      return map;
+    }
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setLocalError(null);
-
     const success = await login(email, password);
     setIsSubmitting(false);
-
     if (success) {
       navigate('/dashboard');
     }
   };
 
-  // Klik peranan → isi email ke form atas sahaja (bukan auto-login)
+  // Klik peranan -> isi email ke form atas sahaja (bukan auto-login)
   const handleSelectRole = (uid: string) => {
     setSelectedRole(uid);
     setEmail(userEmails[uid]);
     setLocalError(null);
   };
 
-  // Kemaskini email dalam panel RBAC dan sync ke form atas jika peranan dipilih
+  // Kemaskini email dalam panel RBAC
   const handleUserEmailChange = (uid: string, newEmail: string) => {
     setUserEmails((prev) => ({ ...prev, [uid]: newEmail }));
     if (selectedRole === uid) {
       setEmail(newEmail);
     }
   };
+
+  const formatRole = (role: string) => role.split('_').join(' ');
 
   return (
     <div className="min-h-screen bg-appbg flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -132,11 +136,12 @@ export const LoginPage: React.FC = () => {
                 <div
                   key={u.uid}
                   onClick={() => handleSelectRole(u.uid)}
-                  className={`w-full text-left p-2.5 rounded-lg border transition-all cursor-pointer text-xs ${
-                    selectedRole === u.uid
+                  className={
+                    'w-full text-left p-2.5 rounded-lg border transition-all cursor-pointer text-xs ' +
+                    (selectedRole === u.uid
                       ? 'border-navy-500 bg-navy-50 ring-1 ring-navy-400'
-                      : 'border-gray-200 hover:border-navy-300 hover:bg-gray-50'
-                  }`}
+                      : 'border-gray-200 hover:border-navy-300 hover:bg-gray-50')
+                  }
                 >
                   {/* Nama + Badge Peranan */}
                   <div className="flex items-center justify-between mb-1.5">
@@ -144,7 +149,7 @@ export const LoginPage: React.FC = () => {
                       {u.fullName}
                     </span>
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-navy-100 text-navy-800 shrink-0 ml-2 whitespace-nowrap">
-                      {u.role.replaceAll('_', ' ')}
+                      {formatRole(u.role)}
                     </span>
                   </div>
 
@@ -156,7 +161,7 @@ export const LoginPage: React.FC = () => {
                     <Mail className="w-3 h-3 text-gray-400 absolute left-2 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
-                      value={userEmails[u.uid]}
+                      value={userEmails[u.uid] || ''}
                       onChange={(e) => handleUserEmailChange(u.uid, e.target.value)}
                       onClick={() => handleSelectRole(u.uid)}
                       placeholder="emel@polibanting.edu.my"
@@ -169,7 +174,7 @@ export const LoginPage: React.FC = () => {
 
             {selectedRole && (
               <p className="text-[10px] text-navy-700 font-medium mt-2 text-center">
-                ✅ Peranan dipilih — semak e-mel di atas dan klik{' '}
+                ✅ Peranan dipilih &mdash; semak e-mel di atas dan klik{' '}
                 <strong>Log Masuk ke SAPIe</strong>
               </p>
             )}
@@ -177,7 +182,7 @@ export const LoginPage: React.FC = () => {
         </div>
 
         <div className="mt-6 text-center text-xs text-gray-500">
-          Hak Cipta Terpelihara © {new Date().getFullYear()} Politeknik Banting Selangor.
+          Hak Cipta Terpelihara &copy; {new Date().getFullYear()} Politeknik Banting Selangor.
         </div>
       </div>
     </div>
