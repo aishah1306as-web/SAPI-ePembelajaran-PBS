@@ -87,10 +87,26 @@ export const UserRoleBadge: React.FC<{ role: UserRole }> = ({ role }) => {
   switch (role) {
     case 'super_admin':
       return <Badge variant="danger">Super Admin</Badge>;
+    case 'admin':
+      return <Badge variant="danger">Admin</Badge>;
     case 'pentadbir_uepm':
       return <Badge variant="primary">Pentadbir UePM</Badge>;
+    case 'ketua_unit_uepm':
+      return <Badge variant="primary">Ketua Unit UePM</Badge>;
+    case 'pegawai_pbs':
+      return <Badge variant="info">Pegawai ePembelajaran PBS</Badge>;
+    case 'pegawai_jpp':
+      return <Badge variant="info">Pegawai ePembelajaran JPP</Badge>;
     case 'pegawai_jabatan':
       return <Badge variant="info">Pegawai Jabatan</Badge>;
+    case 'pegawai_jkm':
+      return <Badge variant="info">Pegawai ePembelajaran JKM</Badge>;
+    case 'pegawai_jmsk':
+      return <Badge variant="info">Pegawai ePembelajaran JMSK</Badge>;
+    case 'pegawai_jpa':
+      return <Badge variant="info">Pegawai ePembelajaran JPA</Badge>;
+    case 'timbalan_pengarah':
+      return <Badge variant="warning">Timbalan Pengarah Akademik</Badge>;
     case 'pensyarah':
       return <Badge variant="success">Pensyarah / Pencipta</Badge>;
     case 'pengurusan':
