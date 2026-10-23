@@ -18,13 +18,13 @@ export const LoginPage: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>('user-superadmin');
 
   // Email boleh diedit untuk setiap pengguna dalam panel RBAC
-  const [userEmails, setUserEmails] = useState<Record<string, string>>(
-    () => {
-      const map: Record<string, string> = {};
-      INITIAL_USERS.forEach((u) => { map[u.uid] = u.email; });
-      return map;
-    }
-  );
+  const [userEmails, setUserEmails] = useState<Record<string, string>>(() => {
+    const map: Record<string, string> = {};
+    INITIAL_USERS.forEach((u) => {
+      map[u.uid] = u.email;
+    });
+    return map;
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,14 +37,12 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  // Klik peranan -> isi email ke form atas sahaja (bukan auto-login)
   const handleSelectRole = (uid: string) => {
     setSelectedRole(uid);
     setEmail(userEmails[uid]);
     setLocalError(null);
   };
 
-  // Kemaskini email dalam panel RBAC
   const handleUserEmailChange = (uid: string, newEmail: string) => {
     setUserEmails((prev) => ({ ...prev, [uid]: newEmail }));
     if (selectedRole === uid) {
@@ -64,7 +62,7 @@ export const LoginPage: React.FC = () => {
           Sistem Arkib Produk Inovasi ePembelajaran (SAPIe)
         </h2>
         <p className="mt-1 text-xs text-gray-500">
-          Portal Rasmi Pengurusan &amp; Pemeliharaan Inovasi Digital Pembelajaran
+          Portal Rasmi Pengurusan & Pemeliharaan Inovasi Digital Pembelajaran
         </p>
       </div>
 
@@ -78,7 +76,6 @@ export const LoginPage: React.FC = () => {
             </div>
           )}
 
-          {/* Form Log Masuk */}
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="label-base">Alamat E-mel Institusi</label>
@@ -143,7 +140,6 @@ export const LoginPage: React.FC = () => {
                       : 'border-gray-200 hover:border-navy-300 hover:bg-gray-50')
                   }
                 >
-                  {/* Nama + Badge Peranan */}
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="font-semibold text-gray-900 truncate">
                       {u.fullName}
@@ -153,7 +149,6 @@ export const LoginPage: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Input E-mel Boleh Diedit */}
                   <div
                     className="relative"
                     onClick={(e) => e.stopPropagation()}
@@ -174,7 +169,7 @@ export const LoginPage: React.FC = () => {
 
             {selectedRole && (
               <p className="text-[10px] text-navy-700 font-medium mt-2 text-center">
-                ✅ Peranan dipilih &mdash; semak e-mel di atas dan klik{' '}
+                {'✅ Peranan dipilih — semak e-mel di atas dan klik '}
                 <strong>Log Masuk ke SAPIe</strong>
               </p>
             )}
@@ -182,7 +177,9 @@ export const LoginPage: React.FC = () => {
         </div>
 
         <div className="mt-6 text-center text-xs text-gray-500">
-          Hak Cipta Terpelihara &copy; {new Date().getFullYear()} Politeknik Banting Selangor.
+          {'Hak Cipta Terpelihara © '}
+          {new Date().getFullYear()}
+          {' Politeknik Banting Selangor.'}
         </div>
       </div>
     </div>
