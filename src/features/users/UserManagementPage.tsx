@@ -254,12 +254,20 @@ export const UserManagementPage: React.FC = () => {
             <div>
               <label className="label-base">Peranan Pengguna (Role) <span className="text-rose-500">*</span></label>
               <select className="input-base" {...register('role')}>
-                <option value="pensyarah">Pensyarah / Pencipta Produk</option>
-                <option value="pegawai_jabatan">Pegawai Jabatan</option>
-                <option value="pentadbir_uepm">Pentadbir UePM</option>
-                <option value="pengurusan">Pengurusan / Pembaca</option>
-                <option value="super_admin">Super Admin</option>
-              </select>
+  <option value="admin">Admin</option>
+  <option value="ketua_unit_uepm">Ketua Unit UePM</option>
+  <option value="pegawai_pbs">Pegawai ePembelajaran PBS</option>
+  <option value="pegawai_jpp">Pegawai ePembelajaran JPP</option>
+  <option value="pegawai_jkm">Pegawai ePembelajaran JKM</option>
+  <option value="pegawai_jmsk">Pegawai ePembelajaran JMSK</option>
+  <option value="pegawai_jpa">Pegawai ePembelajaran JPA</option>
+  <option value="timbalan_pengarah">Timbalan Pengarah Akademik</option>
+  <option value="pensyarah">Pensyarah / Pencipta Produk</option>
+  <option value="pegawai_jabatan">Pegawai Jabatan</option>
+  <option value="pentadbir_uepm">Pentadbir UePM</option>
+  <option value="pengurusan">Pengurusan / Pembaca</option>
+  <option value="super_admin">Super Admin</option>
+</select>
             </div>
 
             <div>
