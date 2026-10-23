@@ -5,17 +5,23 @@ import { ArchiveDocument } from '../types/document';
 
 export function canManageUsers(user: UserProfile | null): boolean {
   if (!user || !user.active) return false;
-  return user.role === 'super_admin';
+  return user.role === 'super_admin' || user.role === 'admin';
 }
 
 export function canManageSystemSettings(user: UserProfile | null): boolean {
   if (!user || !user.active) return false;
-  return user.role === 'super_admin';
+  return user.role === 'super_admin' || user.role === 'admin';
 }
 
 export function canViewAuditLogs(user: UserProfile | null): boolean {
   if (!user || !user.active) return false;
-  return user.role === 'super_admin' || user.role === 'pentadbir_uepm';
+  return (
+    user.role === 'super_admin' ||
+    user.role === 'admin' ||
+    user.role === 'pentadbir_uepm' ||
+    user.role === 'ketua_unit_uepm' ||
+    user.role === 'timbalan_pengarah'
+  );
 }
 
 export function canRegisterProduct(user: UserProfile | null): boolean {
@@ -25,13 +31,26 @@ export function canRegisterProduct(user: UserProfile | null): boolean {
 
 export function canApproveProduct(user: UserProfile | null): boolean {
   if (!user || !user.active) return false;
-  return user.role === 'super_admin' || user.role === 'pentadbir_uepm';
+  return (
+    user.role === 'super_admin' ||
+    user.role === 'admin' ||
+    user.role === 'pentadbir_uepm' ||
+    user.role === 'ketua_unit_uepm'
+  );
 }
 
 export function canReviewDepartmentProduct(user: UserProfile | null, productDeptId?: string): boolean {
   if (!user || !user.active) return false;
-  if (user.role === 'super_admin' || user.role === 'pentadbir_uepm') return true;
-  if (user.role === 'pegawai_jabatan') {
+  if (
+    user.role === 'super_admin' ||
+    user.role === 'admin' ||
+    user.role === 'pentadbir_uepm' ||
+    user.role === 'ketua_unit_uepm' ||
+    user.role === 'timbalan_pengarah'
+  ) return true;
+
+  const deptRoles = ['pegawai_jabatan', 'pegawai_pbs', 'pegawai_jpp', 'pegawai_jkm', 'pegawai_jmsk', 'pegawai_jpa'] as const;
+  if (deptRoles.includes(user.role as typeof deptRoles[number])) {
     return !user.departmentId || user.departmentId === 'SEMUA' || user.departmentId === productDeptId;
   }
   return false;
@@ -39,7 +58,7 @@ export function canReviewDepartmentProduct(user: UserProfile | null, productDept
 
 export function canEditProduct(user: UserProfile | null, product: InnovationProduct): boolean {
   if (!user || !user.active) return false;
-  if (user.role === 'super_admin') return true;
+  if (user.role === 'super_admin' || user.role === 'admin') return true;
   if (user.role === 'pentadbir_uepm' && product.registrationStatus !== 'Diluluskan') return true;
 
   // The creator can edit if it's in Draft or Returned for Correction
@@ -52,27 +71,44 @@ export function canDeleteProduct(user: UserProfile | null, product: InnovationPr
   if (!user || !user.active) return false;
   // An approved product CANNOT be permanently deleted through standard user workflow!
   if (product.registrationStatus === 'Diluluskan') return false;
-  if (user.role === 'super_admin') return true;
+  if (user.role === 'super_admin' || user.role === 'admin') return true;
   return (product.primaryCreatorUid === user.uid) && product.registrationStatus === 'Draf';
 }
 
 export function canSubmitAchievement(user: UserProfile | null, product: InnovationProduct): boolean {
   if (!user || !user.active) return false;
   if (user.role === 'pengurusan') return false;
-  if (user.role === 'super_admin' || user.role === 'pentadbir_uepm') return true;
+  if (
+    user.role === 'super_admin' ||
+    user.role === 'admin' ||
+    user.role === 'pentadbir_uepm' ||
+    user.role === 'ketua_unit_uepm'
+  ) return true;
   return product.primaryCreatorUid === user.uid || product.teamMembers.some(m => m.userId === user.uid);
 }
 
 export function canVerifyAchievement(user: UserProfile | null): boolean {
   if (!user || !user.active) return false;
-  return user.role === 'super_admin' || user.role === 'pentadbir_uepm';
+  return (
+    user.role === 'super_admin' ||
+    user.role === 'admin' ||
+    user.role === 'pentadbir_uepm' ||
+    user.role === 'ketua_unit_uepm'
+  );
 }
 
 export function canUploadDocument(user: UserProfile | null, product: InnovationProduct): boolean {
   if (!user || !user.active) return false;
   if (user.role === 'pengurusan') return false;
-  if (user.role === 'super_admin' || user.role === 'pentadbir_uepm') return true;
-  if (user.role === 'pegawai_jabatan') {
+  if (
+    user.role === 'super_admin' ||
+    user.role === 'admin' ||
+    user.role === 'pentadbir_uepm' ||
+    user.role === 'ketua_unit_uepm'
+  ) return true;
+
+  const deptRoles = ['pegawai_jabatan', 'pegawai_pbs', 'pegawai_jpp', 'pegawai_jkm', 'pegawai_jmsk', 'pegawai_jpa'] as const;
+  if (deptRoles.includes(user.role as typeof deptRoles[number])) {
     return !user.departmentId || user.departmentId === 'SEMUA' || user.departmentId === product.departmentId;
   }
   return product.primaryCreatorUid === user.uid || product.teamMembers.some(m => m.userId === user.uid);
@@ -80,11 +116,17 @@ export function canUploadDocument(user: UserProfile | null, product: InnovationP
 
 export function canViewDocument(user: UserProfile | null, doc: ArchiveDocument): boolean {
   if (!user || !user.active) return false;
-  if (user.role === 'super_admin' || user.role === 'pentadbir_uepm') return true;
+  if (
+    user.role === 'super_admin' ||
+    user.role === 'admin' ||
+    user.role === 'pentadbir_uepm' ||
+    user.role === 'ketua_unit_uepm'
+  ) return true;
   if (doc.accessClassification === 'Awam' || doc.accessClassification === 'Dalaman') return true;
-  
+
   if (doc.accessClassification === 'Terhad') {
-    if (user.role === 'pegawai_jabatan') {
+    const deptRoles = ['pegawai_jabatan', 'pegawai_pbs', 'pegawai_jpp', 'pegawai_jkm', 'pegawai_jmsk', 'pegawai_jpa'] as const;
+    if (deptRoles.includes(user.role as typeof deptRoles[number])) {
       return !user.departmentId || user.departmentId === 'SEMUA' || user.departmentId === doc.departmentId;
     }
     return doc.uploadedBy === user.uid;
@@ -103,10 +145,26 @@ export function getRoleNameMalay(role: UserRole): string {
   switch (role) {
     case 'super_admin':
       return 'Super Admin';
+    case 'admin':
+      return 'Admin';
     case 'pentadbir_uepm':
       return 'Pentadbir UePM';
+    case 'ketua_unit_uepm':
+      return 'Ketua Unit UePM';
+    case 'pegawai_pbs':
+      return 'Pegawai ePembelajaran PBS';
+    case 'pegawai_jpp':
+      return 'Pegawai ePembelajaran JPP';
     case 'pegawai_jabatan':
       return 'Pegawai Jabatan';
+    case 'pegawai_jkm':
+      return 'Pegawai ePembelajaran JKM';
+    case 'pegawai_jmsk':
+      return 'Pegawai ePembelajaran JMSK';
+    case 'pegawai_jpa':
+      return 'Pegawai ePembelajaran JPA';
+    case 'timbalan_pengarah':
+      return 'Timbalan Pengarah Akademik';
     case 'pensyarah':
       return 'Pensyarah / Pencipta';
     case 'pengurusan':
@@ -115,3 +173,4 @@ export function getRoleNameMalay(role: UserRole): string {
       return role;
   }
 }
+
